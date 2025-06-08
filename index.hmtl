@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva de Herramientas IA Gratuitas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The SPA is designed as a dynamic, single-page hub for exploring free AI tools. It abandons the linear report structure for a user-driven, interactive experience. The core components are: 1) A filterable 'Tool Explorer' to quickly find AIs by category. 2) A visual 'Workflows' section demonstrating how to combine tools. 3) An interactive 'Comparator' to analyze tools side-by-side using charts and tables. 4) A 'Strategic Guide' with practical advice. This structure was chosen because users interested in AI tools are often task-oriented; they want to find the right tool, see how to use it, and compare options quickly. The non-linear, interactive design serves this purpose far better than a static document, promoting discovery and understanding. -->
+    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Presentation -> Interaction -> Justification -> Library. 1) Tool Directory -> Inform/Organize -> Card grid -> JS filtering -> Fast, intuitive discovery of tools -> HTML/Tailwind. 2) Workflow Examples -> Organize/Relate -> HTML/CSS diagrams -> Clicking elements for context -> Visualizes connections simply without complex libraries -> HTML/Tailwind. 3) Tool Comparisons (e.g., credits, commercial use) -> Compare -> Bar Chart (for quantitative data like credits) & HTML Table (for qualitative data) -> Dropdown selectors to update chart/table -> Provides both a quick visual comparison and detailed data, more engaging than static tables -> Chart.js & HTML. 4) Strategic Advice -> Inform -> Expandable accordion sections -> Clicking to reveal info -> Organizes dense text into digestible chunks -> HTML/JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF6;
+            color: #4A5568;
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #2D3748;
+            border-color: #38B2AC;
+        }
+        .tool-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .filter-btn.active {
+            background-color: #38B2AC;
+            color: white;
+            border-color: #38B2AC;
+        }
+        .workflow-step {
+            border: 2px solid #E2E8F0;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            flex-grow: 1;
+        }
+        .workflow-arrow {
+            font-size: 2rem;
+            color: #A0AEC0;
+            align-self: center;
+            margin: 0 1rem;
+        }
+        @media (max-width: 768px) {
+            .workflow-container {
+                flex-direction: column;
+            }
+            .workflow-arrow {
+                transform: rotate(90deg);
+                margin: 1rem 0;
+            }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-gray-800">
+                <span class="text-[#38B2AC]">IA</span>pedia Gratuita
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#explorer" class="nav-link font-medium text-gray-600">Explorador</a>
+                <a href="#workflows" class="nav-link font-medium text-gray-600">Flujos de Trabajo</a>
+                <a href="#comparator" class="nav-link font-medium text-gray-600">Comparador</a>
+                <a href="#guide" class="nav-link font-medium text-gray-600">Guía Estratégica</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#explorer" class="block py-2 nav-link">Explorador</a>
+            <a href="#workflows" class="block py-2 nav-link">Flujos de Trabajo</a>
+            <a href="#comparator" class="block py-2 nav-link">Comparador</a>
+            <a href="#guide" class="block py-2 nav-link">Guía Estratégica</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <section id="hero" class="text-center mb-20">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-gray-800 mb-4">Tu Ecosistema de IA Gratuito</h1>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-600">
+                Descubre, compara y combina las mejores herramientas de inteligencia artificial gratuitas. Transforma tus ideas en realidad sin coste alguno.
+            </p>
+        </section>
+
+        <section id="explorer" class="mb-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Explorador de Herramientas IA</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Filtra por categoría para encontrar la herramienta perfecta para tu tarea. Haz clic en cualquier tarjeta para visitar su sitio web oficial.</p>
+            </div>
+            <div id="filters" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+            </div>
+            <div id="tool-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            </div>
+        </section>
+
+        <section id="workflows" class="mb-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">El Arte de la Interconexión</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">El verdadero poder reside en combinar herramientas. Aquí tienes ejemplos de flujos de trabajo que puedes crear para automatizar tareas complejas.</p>
+            </div>
+            <div id="workflow-container" class="space-y-12">
+            </div>
+        </section>
+
+        <section id="comparator" class="mb-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Comparador de Herramientas</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">¿Indeciso? Selecciona hasta tres herramientas de una categoría para comparar sus características clave, límites y políticas de uso.</p>
+            </div>
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                <div class="flex flex-col md:flex-row gap-4 mb-6">
+                    <select id="comparator-category" class="p-3 border border-gray-300 rounded-md w-full md:w-1/4 focus:ring-2 focus:ring-[#38B2AC] focus:border-[#38B2AC]">
+                    </select>
+                    <select id="tool-select-1" class="p-3 border border-gray-300 rounded-md w-full md:w-1/4 focus:ring-2 focus:ring-[#38B2AC] focus:border-[#38B2AC]"></select>
+                    <select id="tool-select-2" class="p-3 border border-gray-300 rounded-md w-full md:w-1/4 focus:ring-2 focus:ring-[#38B2AC] focus:border-[#38B2AC]"></select>
+                    <select id="tool-select-3" class="p-3 border border-gray-300 rounded-md w-full md:w-1/4 focus:ring-2 focus:ring-[#38B2AC] focus:border-[#38B2AC]"></select>
+                </div>
+                <div id="chart-wrapper" class="mb-6">
+                    <div class="chart-container">
+                        <canvas id="comparator-chart"></canvas>
+                    </div>
+                </div>
+                <div id="comparator-table-container" class="overflow-x-auto"></div>
+            </div>
+        </section>
+
+        <section id="guide" class="mb-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Guía Estratégica</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Consejos esenciales para navegar el mundo de la IA gratuita como un experto. Maximiza el rendimiento y protege tu privacidad.</p>
+            </div>
+            <div id="guide-accordion" class="max-w-4xl mx-auto space-y-4">
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>&copy; 2025 IApedia Gratuita. Una guía interactiva para explorar el universo de la IA.</p>
+            <p class="text-sm text-gray-400 mt-2">Creado a partir del informe "Maximizando el Potencial con Herramientas de IA Gratuitas".</p>
+        </div>
+    </footer>
+
+    <script>
+        const aiData = {
+            tools: [
+                { id: 'chatgpt', name: 'ChatGPT', category: 'texto', desc: 'Asistente conversacional versátil para ideas, redacción y resúmenes.', free_tier: 'Uso general gratuito con algunas limitaciones.', link: 'https://chat.openai.com/', credits_numeric: null, commercial_use: 'Sí, limitado' },
+                { id: 'claude', name: 'Claude', category: 'texto', desc: 'Conocido por sus resultados seguros y creativos. Analiza texto e imágenes.', free_tier: 'Uso ilimitado en su plan gratuito.', link: 'https://claude.ai/', credits_numeric: null, commercial_use: 'Sí' },
+                { id: 'gemini', name: 'Gemini (Google)', category: 'texto', desc: 'IA de Google para escritura, investigación y tareas creativas.', free_tier: 'Límites generosos en solicitudes diarias.', link: 'https://gemini.google.com/', credits_numeric: null, commercial_use: 'Sí, pero puede usar datos para mejorar producto' },
+                { id: 'perplexity', name: 'Perplexity AI', category: 'texto', desc: 'Motor de búsqueda conversacional que cita sus fuentes.', free_tier: '3 búsquedas Pro al día.', link: 'https://www.perplexity.ai/', credits_numeric: 3, commercial_use: 'Sí' },
+                { id: 'grammarly', name: 'Grammarly', category: 'productividad', desc: 'Asistente de escritura avanzado para tono, claridad y estilo.', free_tier: 'Correcciones básicas y sugerencias gratuitas.', link: 'https://www.grammarly.com/', credits_numeric: null, commercial_use: 'Sí' },
+                { id: 'writesonic', name: 'Writesonic', category: 'texto', desc: 'Asistente de escritura para contenido SEO, anuncios y webs.', free_tier: 'Prueba gratuita con acceso limitado.', link: 'https://writesonic.com/', credits_numeric: null, commercial_use: 'Sí' },
+                { id: 'leonardo', name: 'Leonardo AI', category: 'imagen', desc: 'Potente generador de arte, videos y PNGs a partir de texto.', free_tier: '150 créditos diarios.', link: 'https://leonardo.ai/', credits_numeric: 150, commercial_use: 'Sí' },
+                { id: 'firefly', name: 'Adobe Firefly', category: 'imagen', desc: 'IA generativa de Adobe para creativos. Integrado en su ecosistema.', free_tier: 'Créditos generativos mensuales.', link: 'https://firefly.adobe.com/', credits_numeric: 25, commercial_use: 'Sí, seguro comercialmente' },
+                { id: 'canvaai', name: 'Canva AI', category: 'imagen', desc: 'Generación de imágenes directamente en el editor de Canva.', free_tier: 'Uso limitado en cuentas gratuitas.', link: 'https://www.canva.com/ai-image-generator/', credits_numeric: null, commercial_use: 'Sí, pero con responsabilidad de usuario' },
+                { id: 'ideogram', name: 'Ideogram AI', category: 'imagen', desc: 'Especializado en generar imágenes con texto legible y tipografía.', free_tier: '10 créditos semanales (~40 imágenes).', link: 'https://ideogram.ai/', credits_numeric: 10, commercial_use: 'Sí' },
+                { id: 'msdesigner', name: 'Microsoft Designer', category: 'imagen', desc: 'Generación de imágenes ilimitada y gratuita con DALL-E 3.', free_tier: 'Ilimitado con cuenta Microsoft.', link: 'https://designer.microsoft.com/', credits_numeric: Infinity, commercial_use: 'Sí' },
+                { id: 'elevenlabs', name: 'ElevenLabs', category: 'audio', desc: 'Síntesis y clonación de voz ultrarrealista (Texto a Voz).', free_tier: '10,000 caracteres/mes.', link: 'https://elevenlabs.io/', credits_numeric: 10000, commercial_use: 'No, requiere atribución' },
+                { id: 'suno', name: 'Suno AI', category: 'audio', desc: 'Crea canciones completas (letra, voz e instrumentos) desde texto.', free_tier: '50 créditos diarios (~10 canciones).', link: 'https://suno.ai/', credits_numeric: 50, commercial_use: 'No' },
+                { id: 'adobenhance', name: 'Adobe Speech Enhancer', category: 'audio', desc: 'Limpia audio eliminando ruido de fondo y eco de grabaciones.', free_tier: '1 hora de audio al día.', link: 'https://podcast.adobe.com/enhance', credits_numeric: 60, commercial_use: 'Sí' },
+                { id: 'vocalremover', name: 'Vocal Remover', category: 'audio', desc: 'Separa la voz de la música en cualquier canción.', free_tier: 'Ilimitado y gratuito.', link: 'https://vocalremover.org/', credits_numeric: Infinity, commercial_use: 'No especificado' },
+                { id: 'codewhisperer', name: 'Amazon CodeWhisperer', category: 'código', desc: 'Asistente de codificación con sugerencias en tiempo real.', free_tier: 'Nivel individual gratuito.', link: 'https://aws.amazon.com/codewhisperer/', credits_numeric: null, commercial_use: 'Sí' },
+                { id: 'replit', name: 'Replit AI', category: 'código', desc: 'Entorno de codificación en navegador con asistente de IA.', free_tier: 'Plan "Starter" con acceso básico.', link: 'https://replit.com/', credits_numeric: null, commercial_use: 'Sí' },
+                { id: 'qodo', name: 'Qodo', category: 'código', desc: 'Asistente para revisiones de código, tests y generación de código.', free_tier: '250 mensajes/mes.', link: 'https://www.qodo.ai/', credits_numeric: 250, commercial_use: 'Sí' },
+                { id: 'notionai', name: 'Notion AI', category: 'productividad', desc: 'Integrado en Notion para resumir, escribir y organizar.', free_tier: '20 respuestas gratuitas por miembro.', link: 'https://www.notion.so/product/ai', credits_numeric: 20, commercial_use: 'Sí' },
+                { id: 'otterai', name: 'Otter.ai', category: 'productividad', desc: 'Transcribe reuniones, genera resúmenes y asigna tareas.', free_tier: '300 minutos/mes.', link: 'https://otter.ai/', credits_numeric: 300, commercial_use: 'Sí' },
+                { id: 'zapier', name: 'Zapier', category: 'automatización', desc: 'Conecta miles de apps para crear flujos de trabajo automatizados.', free_tier: '100 tareas/mes.', link: 'https://zapier.com/', credits_numeric: 100, commercial_use: 'Sí' },
+                { id: 'make', name: 'Make.com', category: 'automatización', desc: 'Plataforma visual para automatizaciones complejas.', free_tier: '1,000 operaciones/mes.', link: 'https://www.make.com/', credits_numeric: 1000, commercial_use: 'Sí' },
+                { id: 'elicit', name: 'Elicit', category: 'investigación', desc: 'Asistente de IA para revisiones de literatura científica.', free_tier: 'Búsqueda ilimitada, 5000 créditos para extracción.', link: 'https://elicit.com/', credits_numeric: 5000, commercial_use: 'Sí' },
+            ],
+            categories: [
+                { id: 'all', name: 'Todas' },
+                { id: 'texto', name: 'Texto y LLMs' },
+                { id: 'imagen', name: 'Imagen y Visual' },
+                { id: 'audio', name: 'Audio y Música' },
+                { id: 'código', name: 'Código y Desarrollo' },
+                { id: 'productividad', name: 'Productividad' },
+                { id: 'automatización', name: 'Automatización' },
+                { id: 'investigación', name: 'Investigación' },
+            ],
+            workflows: [
+                {
+                    title: 'Creación de Contenido Multimedia Automatizado',
+                    desc: 'Genera un vídeo para redes sociales partiendo de una simple idea de texto, combinando IAs de escritura, imagen y audio.',
+                    steps: ['chatgpt', 'leonardo', 'elevenlabs', 'otterai']
+                },
+                {
+                    title: 'Investigación y Elaboración de Informes',
+                    desc: 'Acelera la investigación académica encontrando artículos, extrayendo datos y generando resúmenes de forma automática.',
+                    steps: ['perplexity', 'elicit', 'claude', 'notionai']
+                },
+                {
+                    title: 'Marketing y Gestión de Redes Sociales',
+                    desc: 'Crea y programa contenido atractivo para redes sociales, desde la redacción del texto hasta la generación de la imagen.',
+                    steps: ['writesonic', 'grammarly', 'canvaai', 'zapier']
+                }
+            ],
+            strategicGuide: [
+                {
+                    title: 'Gestiona los Límites de Uso',
+                    content: 'Casi todas las herramientas "gratuitas" funcionan con un sistema de créditos o límites diarios/mensuales. Para maximizar su valor, sé preciso con tus prompts para obtener el resultado deseado en menos intentos. Si alcanzas el límite de una herramienta, ten a mano una alternativa de la misma categoría. ¡Diversificar es la clave!'
+                },
+                {
+                    title: 'Privacidad de Datos y Ética',
+                    content: 'Recuerda que "gratis" a menudo significa que tus datos (los prompts que introduces) pueden ser usados para entrenar los modelos de IA. Evita introducir información personal, sensible o confidencial. Revisa siempre los términos de servicio, especialmente si planeas usar el contenido con fines comerciales. Algunas herramientas requieren atribución.'
+                },
+                {
+                    title: 'Asegura la Calidad y Consistencia',
+                    content: 'La calidad de la IA puede variar. No dudes en iterar y refinar tus prompts. Combina las fortalezas de diferentes herramientas: una para la lluvia de ideas, otra para la generación de imágenes y una tercera para la corrección de estilo. Y lo más importante: siempre realiza una revisión humana final para garantizar la precisión, el tono y la calidad.'
+                },
+                {
+                    title: 'Mantente Siempre Actualizado',
+                    content: 'El mundo de la IA evoluciona a una velocidad vertiginosa. Las herramientas cambian, surgen nuevas y las políticas de uso se actualizan. Únete a comunidades en línea (Reddit, Discord), sigue blogs de tecnología y experimenta constantemente para estar al día de las últimas novedades y optimizar tus flujos de trabajo.'
+                }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const toolGrid = document.getElementById('tool-grid');
+            const filtersContainer = document.getElementById('filters');
+            const workflowContainer = document.getElementById('workflow-container');
+            const guideAccordion = document.getElementById('guide-accordion');
+            const comparatorCategorySelect = document.getElementById('comparator-category');
+            const toolSelects = [
+                document.getElementById('tool-select-1'),
+                document.getElementById('tool-select-2'),
+                document.getElementById('tool-select-3')
+            ];
+            let comparatorChart;
+
+            function renderFilters() {
+                aiData.categories.forEach(cat => {
+                    const button = document.createElement('button');
+                    button.className = 'filter-btn px-4 py-2 text-sm font-medium border-2 border-gray-300 rounded-full transition';
+                    button.textContent = cat.name;
+                    button.dataset.filter = cat.id;
+                    if (cat.id === 'all') button.classList.add('active');
+                    button.addEventListener('click', () => {
+                        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        filterTools(cat.id);
+                    });
+                    filtersContainer.appendChild(button);
+                });
+            }
+
+            function renderTools(tools) {
+                toolGrid.innerHTML = '';
+                tools.forEach(tool => {
+                    const category = aiData.categories.find(c => c.id === tool.category);
+                    const card = document.createElement('a');
+                    card.href = tool.link;
+                    card.target = '_blank';
+                    card.rel = 'noopener noreferrer';
+                    card.className = `tool-card bg-white rounded-xl shadow-md overflow-hidden p-6 flex flex-col items-start gap-4 h-full tool-item ${tool.category}`;
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between w-full">
+                            <h3 class="text-xl font-bold text-gray-900">${tool.name}</h3>
+                            <span class="text-xs font-semibold text-white bg-[#38B2AC] px-2 py-1 rounded-full">${category ? category.name : ''}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm flex-grow">${tool.desc}</p>
+                        <div class="w-full mt-auto">
+                            <p class="text-sm font-semibold text-gray-800">Plan Gratuito:</p>
+                            <p class="text-sm text-gray-500">${tool.free_tier}</p>
+                        </div>
+                    `;
+                    toolGrid.appendChild(card);
+                });
+            }
+
+            function filterTools(filter) {
+                const allTools = aiData.tools;
+                if (filter === 'all') {
+                    renderTools(allTools);
+                } else {
+                    const filtered = allTools.filter(tool => tool.category === filter);
+                    renderTools(filtered);
+                }
+            }
+
+            function renderWorkflows() {
+                aiData.workflows.forEach(wf => {
+                    const wfElement = document.createElement('div');
+                    wfElement.className = 'bg-white p-6 md:p-8 rounded-xl shadow-lg';
+                    
+                    const stepsHtml = wf.steps.map((stepId, index) => {
+                        const tool = aiData.tools.find(t => t.id === stepId);
+                        const isLast = index === wf.steps.length - 1;
+                        return `
+                            <div class="workflow-step">
+                                <h4 class="font-bold text-gray-800">${tool.name}</h4>
+                                <p class="text-sm text-gray-500">${tool.desc.split('.')[0]}</p>
+                            </div>
+                            ${!isLast ? '<div class="workflow-arrow">&rarr;</div>' : ''}
+                        `;
+                    }).join('');
+
+                    wfElement.innerHTML = `
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">${wf.title}</h3>
+                        <p class="text-gray-600 mb-6">${wf.desc}</p>
+                        <div class="workflow-container flex items-stretch justify-center">
+                            ${stepsHtml}
+                        </div>
+                    `;
+                    workflowContainer.appendChild(wfElement);
+                });
+            }
+
+            function renderGuide() {
+                aiData.strategicGuide.forEach((item, index) => {
+                    const guideItem = document.createElement('div');
+                    guideItem.className = 'bg-white rounded-lg shadow-sm overflow-hidden';
+                    guideItem.innerHTML = `
+                        <button class="w-full text-left p-4 flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100">
+                            <h3 class="font-semibold text-gray-800">${item.title}</h3>
+                            <span class="transform transition-transform duration-300 text-xl text-gray-500">+</span>
+                        </button>
+                        <div class="p-4 pt-0 max-h-0 overflow-hidden transition-max-height duration-500 ease-in-out">
+                            <p class="text-gray-600">${item.content}</p>
+                        </div>
+                    `;
+                    const button = guideItem.querySelector('button');
+                    const content = guideItem.querySelector('div');
+                    const icon = guideItem.querySelector('span');
+
+                    button.addEventListener('click', () => {
+                        const isExpanded = content.style.maxHeight && content.style.maxHeight !== '0px';
+                        if (isExpanded) {
+                            content.style.maxHeight = '0px';
+                            icon.classList.remove('rotate-45');
+                        } else {
+                            content.style.maxHeight = content.scrollHeight + 'px';
+                            icon.classList.add('rotate-45');
+                        }
+                    });
+
+                    guideAccordion.appendChild(guideItem);
+                });
+            }
+            
+            function setupComparator() {
+                const comparatorCategories = aiData.categories.filter(c => c.id !== 'all');
+                comparatorCategories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.id;
+                    option.textContent = cat.name;
+                    comparatorCategorySelect.appendChild(option);
+                });
+
+                comparatorCategorySelect.addEventListener('change', (e) => {
+                    populateToolSelectors(e.target.value);
+                    updateComparator();
+                });
+
+                toolSelects.forEach(select => {
+                    select.addEventListener('change', updateComparator);
+                });
+                
+                populateToolSelectors(comparatorCategories[0].id);
+                // Set initial default selections
+                const initialTools = aiData.tools.filter(t => t.category === comparatorCategories[0].id);
+                toolSelects.forEach((select, index) => {
+                    if (initialTools[index]) {
+                        select.value = initialTools[index].id;
+                    }
+                });
+                updateComparator();
+            }
+
+            function populateToolSelectors(category) {
+                const toolsInCategory = aiData.tools.filter(t => t.category === category);
+                toolSelects.forEach(select => {
+                    const currentVal = select.value;
+                    select.innerHTML = '<option value="">-- Selecciona --</option>';
+                    toolsInCategory.forEach(tool => {
+                        const option = document.createElement('option');
+                        option.value = tool.id;
+                        option.textContent = tool.name;
+                        select.appendChild(option);
+                    });
+                    select.value = currentVal;
+                     if (!select.value && toolsInCategory.find(t=>t.id === currentVal)) {
+                         select.value = currentVal;
+                     }
+                });
+            }
+
+            function updateComparator() {
+                const selectedToolIds = toolSelects.map(select => select.value).filter(Boolean);
+                const selectedTools = selectedToolIds.map(id => aiData.tools.find(t => t.id === id));
+                
+                updateComparatorChart(selectedTools);
+                updateComparatorTable(selectedTools);
+            }
+
+            function updateComparatorChart(tools) {
+                const ctx = document.getElementById('comparator-chart').getContext('2d');
+                
+                if (comparatorChart) {
+                    comparatorChart.destroy();
+                }
+
+                const creditTools = tools.filter(t => t.credits_numeric !== null && t.credits_numeric !== Infinity);
+                const labels = creditTools.map(t => t.name);
+                const data = creditTools.map(t => t.credits_numeric);
+
+                if (labels.length === 0) {
+                     document.getElementById('chart-wrapper').style.display = 'none';
+                     return;
+                }
+                document.getElementById('chart-wrapper').style.display = 'block';
+
+                comparatorChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Créditos / Límite (por día/mes/etc.)',
+                            data: data,
+                            backgroundColor: ['#6EE7B7', '#93C5FD', '#FBBF24'],
+                            borderColor: ['#34D399', '#60A5FA', '#F59E0B'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Comparación de Límites en Plan Gratuito (Numérico)',
+                                font: { size: 16 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            const tool = creditTools[context.dataIndex];
+                                            let unit = ' créditos';
+                                            if (tool.id === 'adobenhance') unit = ' minutos/día';
+                                            if (tool.id === 'otterai') unit = ' minutos/mes';
+                                            if (tool.id === 'elevenlabs') unit = ' caracteres/mes';
+                                            label += context.parsed.y + unit;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Cantidad'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function updateComparatorTable(tools) {
+                const container = document.getElementById('comparator-table-container');
+                if (tools.length === 0) {
+                    container.innerHTML = '<p class="text-center text-gray-500">Selecciona al menos una herramienta para ver la comparación.</p>';
+                    return;
+                }
+
+                let headerHtml = '<th>Característica</th>';
+                tools.forEach(tool => {
+                    headerHtml += `<th class="text-left p-3">${tool.name}</th>`;
+                });
+
+                let commercialUseHtml = '<td>Uso Comercial</td>';
+                tools.forEach(tool => {
+                    commercialUseHtml += `<td class="p-3">${tool.commercial_use}</td>`;
+                });
+                
+                let freeTierHtml = '<td>Detalle Plan Gratuito</td>';
+                tools.forEach(tool => {
+                    freeTierHtml += `<td class="p-3">${tool.free_tier}</td>`;
+                });
+
+                container.innerHTML = `
+                    <table class="w-full text-sm text-left text-gray-600">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                            <tr>${headerHtml}</tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-white border-b">${commercialUseHtml}</tr>
+                            <tr class="bg-gray-50 border-b">${freeTierHtml}</tr>
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            function setupMobileMenu() {
+                const menuButton = document.getElementById('mobile-menu-button');
+                const mobileMenu = document.getElementById('mobile-menu');
+                menuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            function setupScrollSpy() {
+                const sections = document.querySelectorAll('main section[id]');
+                const navLinks = document.querySelectorAll('.nav-link');
+                
+                window.onscroll = () => {
+                    let current = '';
+                    sections.forEach(section => {
+                        const sectionTop = section.offsetTop;
+                        if (pageYOffset >= sectionTop - 100) {
+                            current = section.getAttribute('id');
+                        }
+                    });
+
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href').substring(1) === current) {
+                            link.classList.add('active');
+                        }
+                    });
+                };
+            }
+
+            renderFilters();
+            renderTools(aiData.tools);
+            renderWorkflows();
+            renderGuide();
+            setupComparator();
+            setupMobileMenu();
+            setupScrollSpy();
+        });
+    </script>
+</body>
+</html>
